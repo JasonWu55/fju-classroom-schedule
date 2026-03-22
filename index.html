@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>輔大教室課表查詢</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23814a2b'/%3E%3Cpath d='M14 20h36v24H14z' fill='%23fff7ef'/%3E%3Cpath d='M22 16h4v8h-4zm16 0h4v8h-4z' fill='%23fff7ef'/%3E%3Cpath d='M22 30h20v4H22zm0 8h14v4H22z' fill='%23814a2b'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <section class="hero-copy panel">
+        <p class="eyebrow">FJU Classroom Lookup</p>
+        <h1>輔大教室課表查詢</h1>
+        <p class="hero-text">
+	  想找空教室嗎？ 輸入教室 ID 即可輕鬆查詢每間教室的課表
+          輸入像 <code>LI105</code> 這樣的 classroom ID，
+          就能快速查看週一到週六每一節的占用狀態與課程資訊。
+	  請注意：老師自行更換教室或其他原因換教室不會顯示喔～
+        </p>
+
+        <div class="meta-strip">
+          <article class="meta-card">
+            <span>學制</span>
+            <strong id="meta-division">載入中</strong>
+          </article>
+          <article class="meta-card">
+            <span>資料更新</span>
+            <strong id="meta-generated">載入中</strong>
+          </article>
+          <article class="meta-card">
+            <span>課程筆數</span>
+            <strong id="meta-courses">-</strong>
+          </article>
+          <article class="meta-card">
+            <span>教室總數</span>
+            <strong id="meta-rooms">-</strong>
+          </article>
+        </div>
+      </section>
+
+      <form class="lookup-panel panel" id="room-lookup-form" novalidate>
+        <p class="eyebrow">Single Room</p>
+        <h2>Find one room</h2>
+        <p class="section-text">
+          先輸入完整教室代碼；如果沒有完全相符，系統會列出最接近的教室供你切換。
+        </p>
+
+        <label class="search-field" for="room-query">
+          <span>教室代碼</span>
+          <div class="search-row">
+            <input
+              id="room-query"
+              type="search"
+              inputmode="text"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              placeholder="例如 LI105"
+              aria-describedby="lookup-helper"
+            >
+            <button id="room-submit" type="submit">查看課表</button>
+          </div>
+        </label>
+
+        <p class="field-note" id="lookup-helper">支援完整代碼與相近搜尋，例如 LI105、LE1A、LM302。</p>
+        <div class="chip-row" id="quick-examples" aria-label="教室範例"></div>
+        <div id="status-banner" class="status-banner">正在讀取課程資料…</div>
+      </form>
+    </header>
+
+    <main class="content-grid">
+      <section class="panel room-focus">
+        <div class="section-heading">
+          <p class="eyebrow">Selected Room</p>
+          <h2 id="room-heading">輸入教室代碼開始查詢</h2>
+          <p class="section-text" id="room-match-note">載入完成後，這裡會顯示該教室的整週摘要與查詢狀態。</p>
+        </div>
+
+        <div class="summary-grid">
+          <article class="summary-card">
+            <span>所屬大樓</span>
+            <strong id="summary-building">-</strong>
+          </article>
+          <article class="summary-card">
+            <span>有課節次</span>
+            <strong id="summary-occupied">-</strong>
+          </article>
+          <article class="summary-card">
+            <span>空堂節次</span>
+            <strong id="summary-free">-</strong>
+          </article>
+          <article class="summary-card">
+            <span>上課日數</span>
+            <strong id="summary-days">-</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel suggestion-panel">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Matches</p>
+            <h2 id="suggestion-title">快速開始</h2>
+          </div>
+          <span class="result-count" id="suggestion-count">0 筆</span>
+        </div>
+
+        <p class="section-text" id="suggestion-copy">資料載入後，這裡會顯示可直接切換的教室建議。</p>
+        <div class="chip-row" id="suggestion-list" aria-live="polite"></div>
+      </section>
+
+      <section class="panel timetable-panel">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Weekly Timetable</p>
+            <h2>整週節次矩陣</h2>
+          </div>
+          <span class="result-count" id="grid-caption">尚未選擇教室</span>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <strong id="empty-state-title">先查一間教室</strong>
+          <p id="empty-state-copy">輸入教室代碼，或從建議清單中點選一間教室，即可查看每一天、每一節的占用與空堂狀態。</p>
+        </div>
+
+        <div class="day-view is-hidden" id="day-view">
+          <div class="day-switcher" id="day-switcher" aria-label="切換查看星期"></div>
+          <div class="day-cards" id="day-cards" aria-live="polite"></div>
+        </div>
+
+        <div class="table-wrap is-hidden" id="table-wrap">
+          <table class="timetable" id="room-timetable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-credit" aria-label="網站資訊">
+      <p>
+        製作與維護資訊：WHL。聯絡信箱
+        <a href="mailto:hi@whl.tw">hi@whl.tw</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -74,45 +74,18 @@
     </header>
 
     <main class="content-grid">
-      <section class="panel room-focus">
-        <div class="section-heading">
-          <p class="eyebrow">Selected Room</p>
-          <h2 id="room-heading">輸入教室代碼開始查詢</h2>
-          <p class="section-text" id="room-match-note">載入完成後，這裡會顯示該教室的整週摘要與查詢狀態。</p>
-        </div>
-
-        <div class="summary-grid">
-          <article class="summary-card">
-            <span>所屬大樓</span>
-            <strong id="summary-building">-</strong>
-          </article>
-          <article class="summary-card">
-            <span>有課節次</span>
-            <strong id="summary-occupied">-</strong>
-          </article>
-          <article class="summary-card">
-            <span>空堂節次</span>
-            <strong id="summary-free">-</strong>
-          </article>
-          <article class="summary-card">
-            <span>上課日數</span>
-            <strong id="summary-days">-</strong>
-          </article>
-        </div>
-      </section>
-
-      <section class="panel suggestion-panel">
-        <div class="section-heading inline-heading">
-          <div>
-            <p class="eyebrow">Matches</p>
-            <h2 id="suggestion-title">快速開始</h2>
-          </div>
-          <span class="result-count" id="suggestion-count">0 筆</span>
-        </div>
-
-        <p class="section-text" id="suggestion-copy">資料載入後，這裡會顯示可直接切換的教室建議。</p>
-        <div class="chip-row" id="suggestion-list" aria-live="polite"></div>
-      </section>
+      <div hidden aria-hidden="true">
+        <h2 id="room-heading">輸入教室代碼開始查詢</h2>
+        <p id="room-match-note">載入完成後，這裡會顯示該教室的整週摘要與查詢狀態。</p>
+        <strong id="summary-building">-</strong>
+        <strong id="summary-occupied">-</strong>
+        <strong id="summary-free">-</strong>
+        <strong id="summary-days">-</strong>
+        <h2 id="suggestion-title">快速開始</h2>
+        <span id="suggestion-count">0 筆</span>
+        <p id="suggestion-copy">資料載入後，這裡會顯示可直接切換的教室建議。</p>
+        <div id="suggestion-list" aria-live="polite"></div>
+      </div>
 
       <section class="panel timetable-panel">
         <div class="section-heading inline-heading">
